@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using GraphQLHeros.Data;
 using GraphQLHeros.Interfaces;
 using GraphQLHeros.Repositories;
+using HotChocolate.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,12 +35,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                 .SetIsOriginAllowed((host) => true)
+                 .AllowCredentials());
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGraphQL(path: "/graphql", null);
+app.MapGraphQL(path: "/graphql", null).WithOptions(new GraphQLServerOptions
+{
+    AllowedGetOperations = AllowedGetOperations.QueryAndMutation,
+    EnableGetRequests = true,
+    Tool = { Enable = true }
+});
 
 app.Run();
