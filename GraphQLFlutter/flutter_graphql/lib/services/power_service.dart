@@ -37,4 +37,108 @@ class PowerService {
     }
   }
 
+  Future<bool> addPower(Power power) async {
+    String document = 
+    """
+      mutation(\$power: SuperpowerInput!){
+        addSuperpower(superpower: \$power){
+          id
+        }
+      }
+    """;
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(document),
+          variables: {
+            "power":{
+                  "superheroId":  power.superHeroId,
+                  "description": power.description,
+                  "superPower": power.superPower
+                }
+          }
+        )
+      );
+      if(result.hasException){
+        throw Exception(result.exception);
+      }
+      var res = result.data?['addSuperpower'];
+      if(res == null || res.isEmpty){
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+    Future<bool> updatePower(Power power) async {
+    String document = 
+    """
+      mutation(\$power: SuperpowerInput!){
+        updateSuperpower(superpower: \$power){
+          id
+        }
+      }
+    """;
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(document),
+          variables: {
+            "power":{
+                  "id": power.id,
+                  "superheroId":  power.superHeroId,
+                  "description": power.description,
+                  "superPower": power.superPower
+                }
+          }
+        )
+      );
+      if(result.hasException){
+        throw Exception(result.exception);
+      }
+      var res = result.data?['addSuperpower'];
+      if(res == null || res.isEmpty){
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<bool> deletePower(String? uuid) async {
+    String document = 
+    """
+      mutation(\$uuid: UUID!){
+        deleteSuperpower(id: \$uuid)
+      }
+    """;
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(document),
+          variables: {
+            "uuid": uuid
+          }
+        )
+      );
+      if(result.hasException){
+        throw Exception(result.exception);
+      }
+      var res = result.data?['deleteSuperpower'];
+      if(res == null || res.isEmpty){
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+
 }

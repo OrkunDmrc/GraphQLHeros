@@ -40,5 +40,34 @@ class HeroService {
       throw Exception(e);
     }
   }
-  //title:result.data!['continent']['countries'][index]["name"],
-}
+  Future<List<SuperHero>> getHerosForDropdown() async {
+    String document = 
+    """
+      query{
+        superheroes{
+          id
+          name
+        }
+      }
+    """;
+    try {
+      QueryResult result = await client.query(
+        QueryOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(document)
+        )
+      );
+      if(result.hasException){
+        throw Exception(result.exception);
+      }
+      List? res = result.data?['superheroes'];
+      if(res == null || res.isEmpty){
+        return [];
+      }
+      List<SuperHero> heros = res.map((hero) => SuperHero.fromMap(map: hero)).toList();
+      return heros;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+ }

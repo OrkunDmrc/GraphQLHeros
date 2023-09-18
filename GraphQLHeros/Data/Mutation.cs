@@ -16,7 +16,7 @@ namespace GraphQLHeros.Data
             context.SaveChanges();
             return superhero;
         }
-        public Superpower SaveSuperpower([Service] ApplicationDbContext context, Superpower superpower)
+        public Superpower AddSuperpower([Service] ApplicationDbContext context, Superpower superpower)
         {
             context.Superpowers.Add(superpower);
             context.SaveChanges();

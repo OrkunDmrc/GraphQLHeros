@@ -1,14 +1,14 @@
 import 'dart:io';
-
 import 'package:flutter_graphql/book_model.dart';
 import 'package:flutter_graphql/graphql_service.dart';
+import 'package:flutter_graphql/models/hero.dart';
+import 'package:flutter_graphql/models/power.dart';
 import 'package:flutter_graphql/pages/hero_list_page.dart';
 import 'package:flutter_graphql/pages/movie_list_page.dart';
 import 'package:flutter_graphql/pages/power_list_page.dart';
-
-import 'blog_row.dart';
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:flutter_graphql/services/hero_service.dart';
+import 'package:flutter_graphql/services/power_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,11 +42,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyhomePageState extends State<MyHomePage> with TickerProviderStateMixin{
-  List<BookModel>? _books;
-  final GraphQLService _graphQLService = GraphQLService();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _authorController = TextEditingController();
-  final TextEditingController _yearController = TextEditingController();
 
   late TabController _tabController;
 
@@ -54,7 +49,6 @@ class _MyhomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   void initState() {
     _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
     super.initState();
-    _load();
   }
 
   @override
@@ -63,15 +57,8 @@ class _MyhomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     super.dispose();
   }
 
-  void _load() async {
-    //_books = await _graphQLService.getBooks(limit: 5);
-    setState(() {});
-  }
-
   void clear(){
-    _titleController.clear();
-    _authorController.clear();
-    _yearController.clear();
+
   }
 
   @override
@@ -93,24 +80,101 @@ class _MyhomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         ),
         body: TabBarView(
           controller: _tabController,
-          children: [
+          children: const [
             PowerListPage(),
             HeroListPage(),
             MovieListPage(),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
+        /*floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () => {
-            if(_tabController.index == 0){
+            showDialog(
+              context: (context), 
+              builder: (content) {
+                if(_tabController.index == 0){
+                  return AlertDialog(
+                    title: Text('Add New Power'),
+                    content: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextFormField(
+                            key: _powerPowerFieldKey,
+                            decoration: const InputDecoration(labelText: 'Power'),
+                            validator: (val) {
+                              return (val == null || val.isEmpty) ? 'Please enter the power' : null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            key: _powerDescriptionFieldKey,
+                            decoration: const InputDecoration(labelText: 'Description'),
+                            validator: (val) {
+                              return (val == null || val.isEmpty) ? 'Please enter the description' : null;
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          const Text('Hero'),
+                          DropdownButtonFormField<SuperHero>(
+                            value: _powerHeroDropdownValue,
+                            items: _powerHeros?.map((SuperHero items){
+                              return DropdownMenuItem<SuperHero>(
+                                value: items,
+                                child: Text(items.name.toString())
+                              );
+                            }).toList(), 
+                            onChanged: (SuperHero? newValue) { 
+                              setState(() {
+                                _powerHeroDropdownValue = newValue;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              if(_formKey.currentState!.validate()){
+                                _formKey.currentState?.save();
+                                _powerService.addPower(
+                                  Power(
+                                    superPower: _powerPowerFieldKey.currentState?.value,
+                                    description: _powerDescriptionFieldKey.currentState?.value,
+                                    superHeroId: _powerHeroDropdownValue?.id
+                                  )
+                                );
 
-            }else if(_tabController.index == 1){
-
-            }else{
-
-            }
+                              }
+                            },
+                            child: const Text('Add'),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }else if(_tabController.index == 1){
+                  return AlertDialog(
+                    title: Text('asdf'),
+                    content: Column(
+                      children: [
+                        TextFormField(
+                          key: _powerPowerFieldKey,
+                          decoration: const InputDecoration(labelText: 'Power'),
+                          validator: (val) {
+                            return (val == null || val.isEmpty) ? 'Please enter the power' : null;
+                          },
+                        ),
+                      ]
+                    ),
+                  );
+                }else{
+                  return Text('asdf');
+                }
+              }
+            )
           },
-        ),
+        ),*/
       ),
     );
   }
