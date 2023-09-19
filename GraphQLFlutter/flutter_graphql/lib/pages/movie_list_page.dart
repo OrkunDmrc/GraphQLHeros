@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_graphql/models/hero.dart';
 import 'package:flutter_graphql/models/movie.dart';
+import 'package:flutter_graphql/services/hero_service.dart';
 import 'package:flutter_graphql/services/movie_service.dart';
 
 class MovieListPage extends StatefulWidget {
@@ -11,7 +13,16 @@ class MovieListPage extends StatefulWidget {
 
 class _MovieListPage extends State<MovieListPage>{
   List<Movie>? _movieList;
-  MovieService _movieService = MovieService();
+  final MovieService _movieService = MovieService();
+  final HeroService _heroService = HeroService();
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final GlobalKey<FormFieldState> _titleFieldKey = GlobalKey();
+  final GlobalKey<FormFieldState> _descriptionFieldKey = GlobalKey();
+  final GlobalKey<FormFieldState> _instructorFieldKey = GlobalKey();
+  DateTime _releasedDate = DateTime.now();
+  late List<SuperHero>? _powerHeros;
+  late SuperHero? _powerHeroDropdownValue;
+  
 
   @override
   void initState() {
@@ -21,6 +32,8 @@ class _MovieListPage extends State<MovieListPage>{
 
   void _load() async {
     _movieList = await _movieService.getMovieList();
+    _powerHeros = await _heroService.getHeroesForDropdown();
+    _powerHeroDropdownValue = _powerHeros?.first;
     setState(() {});
   }
 
@@ -36,17 +49,126 @@ class _MovieListPage extends State<MovieListPage>{
             title: Text('${_movieList![index].title}'),
             subtitle: Text(('${_movieList![index].releaseDate}')),
             onTap: () => {
-              print('${_movieList![index].title}')
+              print('Hooop')
             },
-            trailing: IconButton(
-              onPressed: () {
-                //_graphQLService.deleteBook(id: _books![index].id!);
-                _load();
-              },
-              icon: const Icon(Icons.delete, color: Colors.red,)
+            trailing: Wrap(
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    showDialog(
+                      context: (context), 
+                      builder: (content) {
+                        return AlertDialog(
+                          title: const Text('Update Movie'),
+                          content: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextFormField(
+                                  key: _titleFieldKey,
+                                  decoration: const InputDecoration(labelText: 'Title'),
+                                  validator: (val) {
+                                    return (val == null || val.isEmpty) ? 'Please enter the power' : null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                TextFormField(
+                                  key: _descriptionFieldKey,
+                                  decoration: const InputDecoration(labelText: 'Description'),
+                                  validator: (val) {
+                                    return (val == null || val.isEmpty) ? 'Please enter the description' : null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                TextFormField(
+                                  key: _instructorFieldKey,
+                                  decoration: const InputDecoration(labelText: 'Instructor'),
+                                  validator: (val) {
+                                    return (val == null || val.isEmpty) ? 'Please enter the instructor' : null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    DateTime? newDate = await showDatePicker(
+                                      context: context, 
+                                      initialDate: _releasedDate,
+                                      firstDate: DateTime(1900), 
+                                      lastDate: DateTime(2100)
+                                    );
+                                    if(newDate == null) return;
+                                    setState(() {
+                                        _releasedDate = newDate;
+                                    });
+                                  }, 
+                                  child: Text('${_releasedDate}'),
+                                ),
+                                const SizedBox(height: 20),
+                                const Text('Hero'),
+                                DropdownButtonFormField<SuperHero>(
+                                  value: _powerHeroDropdownValue,
+                                  items: _powerHeros?.map((SuperHero items){
+                                    return DropdownMenuItem<SuperHero>(
+                                      value: items,
+                                      child: Text(items.name.toString())
+                                    );
+                                  }).toList(), 
+                                  onChanged: (SuperHero? newValue) { 
+                                    setState(() {
+                                      _powerHeroDropdownValue = newValue;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    if(_formKey.currentState!.validate()){
+                                      _formKey.currentState?.save();
+                                      var updated = await _movieService.updateMovie(
+                                        Movie(
+                                          id: _movieList![index].id,
+                                          title: _titleFieldKey.currentState?.value,
+                                          description: _descriptionFieldKey.currentState?.value
+                                        )
+                                      );
+                                      if(updated != null){
+                                        setState(() {
+                                          _movieList![index] = updated;
+                                        });
+                                        Navigator.pop(context);
+                                      }
+                                    }
+                                  },
+                                  child: const Text('Update'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                    );
+                  },
+                  icon: const Icon(Icons.edit, color: Colors.blue,)
+                ),
+                IconButton(
+                  onPressed: () async {
+                    var isDeleted = await _movieService.deleteMovie(_movieList![index].id);
+                    if(isDeleted){
+                      setState(() {
+                        _movieList?.remove(_movieList![index]);
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.red,)
+                ),
+              ],
             ),
+            
           ),
-        )
+        ),
+        
     );
   }
 

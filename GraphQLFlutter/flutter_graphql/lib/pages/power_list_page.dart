@@ -29,7 +29,7 @@ class _PowerListPage extends State<PowerListPage>{
 
   void _load() async {
     _powerList = await _powerService.getPowerList();
-    _powerHeros = await _heroService.getHerosForDropdown();
+    _powerHeros = await _heroService.getHeroesForDropdown();
     _powerHeroDropdownValue = _powerHeros?.first;
     setState(() {});
   }
@@ -97,7 +97,7 @@ class _PowerListPage extends State<PowerListPage>{
                                   onPressed: () async {
                                     if(_formKey.currentState!.validate()){
                                       _formKey.currentState?.save();
-                                      await _powerService.updatePower(
+                                      var updatedPower = await _powerService.updatePower(
                                         Power(
                                           id: _powerList![index].id,
                                           superPower: _powerPowerFieldKey.currentState?.value,
@@ -105,8 +105,12 @@ class _PowerListPage extends State<PowerListPage>{
                                           superHeroId: _powerHeroDropdownValue?.id
                                         )
                                       );
-                                      _load();
-                                      Navigator.pop(context);
+                                      if(updatedPower != null){
+                                        setState(() {
+                                          _powerList![index] = updatedPower;
+                                        });
+                                        Navigator.pop(context);
+                                      }
                                     }
                                   },
                                   child: const Text('Update'),
@@ -117,14 +121,17 @@ class _PowerListPage extends State<PowerListPage>{
                         );
                       }
                     );
-                    _load();
                   },
                   icon: const Icon(Icons.edit, color: Colors.blue,)
                 ),
                 IconButton(
                   onPressed: () async {
-                    await _powerService.deletePower(_powerList![index].id);
-                    _load();
+                    var isDeleted = await _powerService.deletePower(_powerList![index].id);
+                    if(isDeleted){
+                      setState(() {
+                        _powerList?.remove(_powerList![index]);
+                      });
+                    }
                   },
                   icon: const Icon(Icons.delete, color: Colors.red,)
                 ),
@@ -182,15 +189,19 @@ class _PowerListPage extends State<PowerListPage>{
                           onPressed: () async {
                             if(_formKey.currentState!.validate()){
                               _formKey.currentState?.save();
-                              await _powerService.addPower(
+                              var newPower = await _powerService.addPower(
                                 Power(
                                   superPower: _powerPowerFieldKey.currentState?.value,
                                   description: _powerDescriptionFieldKey.currentState?.value,
                                   superHeroId: _powerHeroDropdownValue?.id
                                 )
                               );
-                              _load();
-                              Navigator.pop(context);
+                              if(newPower != null){
+                                setState(() {
+                                  _powerList?.add(newPower);
+                                });
+                                Navigator.pop(context);
+                              }
                             }
                           },
                           child: const Text('Add'),

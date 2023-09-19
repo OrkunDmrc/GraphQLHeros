@@ -37,12 +37,13 @@ class PowerService {
     }
   }
 
-  Future<bool> addPower(Power power) async {
+  Future<Power?> addPower(Power power) async {
     String document = 
     """
       mutation(\$power: SuperpowerInput!){
         addSuperpower(superpower: \$power){
           id
+          superPower
         }
       }
     """;
@@ -65,20 +66,21 @@ class PowerService {
       }
       var res = result.data?['addSuperpower'];
       if(res == null || res.isEmpty){
-        return false;
+        return null;
       }
-      return true;
+      return Power.fromMap(map: res);
     } catch (e) {
       throw Exception(e);
     }
   }
 
-    Future<bool> updatePower(Power power) async {
+    Future<Power?> updatePower(Power power) async {
     String document = 
     """
       mutation(\$power: SuperpowerInput!){
         updateSuperpower(superpower: \$power){
           id
+          superPower
         }
       }
     """;
@@ -100,11 +102,11 @@ class PowerService {
       if(result.hasException){
         throw Exception(result.exception);
       }
-      var res = result.data?['addSuperpower'];
+      var res = result.data?['updateSuperpower'];
       if(res == null || res.isEmpty){
-        return false;
+        return null;
       }
-      return true;
+      return Power.fromMap(map: res);
     } catch (e) {
       throw Exception(e);
     }

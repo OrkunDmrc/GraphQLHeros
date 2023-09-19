@@ -40,7 +40,7 @@ class HeroService {
       throw Exception(e);
     }
   }
-  Future<List<SuperHero>> getHerosForDropdown() async {
+  Future<List<SuperHero>> getHeroesForDropdown() async {
     String document = 
     """
       query{
@@ -70,4 +70,108 @@ class HeroService {
       throw Exception(e);
     }
   }
+
+  Future<bool> addHero(SuperHero hero) async {
+    String document = 
+    """
+      mutation(\$hero: SuperheroInput!){
+        addSuperhero(superhero: \$hero) {
+          id
+        }
+      }
+    """;
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(document),
+          variables: {
+            "hero":{
+                "name":  hero.name,
+                "description": hero.description,
+                "height": hero.height
+              }
+          }
+        )
+      );
+      if(result.hasException){
+        throw Exception(result.exception);
+      }
+      var res = result.data?['addSuperhero'];
+      if(res == null || res.isEmpty){
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+    Future<bool> updateHero(SuperHero hero) async {
+    String document = 
+    """
+      mutation(\$hero: SuperheroInput!){
+        updateSuperhero(superhero: \$hero) {
+          id
+        }
+      }
+    """;
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(document),
+          variables: {
+            "hero":{
+              "id": hero.id,
+              "name":  hero.name,
+              "description": hero.description,
+              "height": hero.height
+            }
+          }
+        )
+      );
+      if(result.hasException){
+        throw Exception(result.exception);
+      }
+      var res = result.data?['updateSuperhero'];
+      if(res == null || res.isEmpty){
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<bool> deleteHero(String? uuid) async {
+    String document = 
+    """
+      mutation(\$uuid: UUID!){
+        deleteSuperhero(id: \$uuid)
+      }
+    """;
+    try {
+      QueryResult result = await client.mutate(
+        MutationOptions(
+          fetchPolicy: FetchPolicy.noCache,
+          document: gql(document),
+          variables: {
+            "uuid": uuid
+          }
+        )
+      );
+      if(result.hasException){
+        throw Exception(result.exception);
+      }
+      var res = result.data?['deleteSuperhero'];
+      if(res == null || res.isEmpty){
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
  }

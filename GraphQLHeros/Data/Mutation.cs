@@ -4,13 +4,13 @@ namespace GraphQLHeros.Data
 {
     public class Mutation
     {
-        public Movie SaveMovie([Service] ApplicationDbContext context, Movie movie)
+        public Movie AddMovie([Service] ApplicationDbContext context, Movie movie)
         {
             context.Movies.Add(movie);
             context.SaveChanges();
             return movie;
         }
-        public Superhero SaveSuperhero([Service] ApplicationDbContext context, Superhero superhero)
+        public Superhero AddSuperhero([Service] ApplicationDbContext context, Superhero superhero)
         {
             context.Superheroes.Add(superhero);
             context.SaveChanges();
