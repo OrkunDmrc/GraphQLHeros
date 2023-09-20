@@ -122,8 +122,8 @@ class MovieService {
   Future<bool> deleteMovie(String? uuid) async {
     String document = 
     """
-      mutation($uuid: UUID!){
-        deleteMovie(id: $uuid)
+      mutation(\$uuid: UUID!){
+        deleteMovie(id: \$uuid)
       }
     """;
     try {

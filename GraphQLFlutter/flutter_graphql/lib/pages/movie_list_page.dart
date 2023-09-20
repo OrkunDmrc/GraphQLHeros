@@ -21,7 +21,7 @@ class _MovieListPage extends State<MovieListPage>{
   final GlobalKey<FormFieldState> _instructorFieldKey = GlobalKey();
   DateTime _releasedDate = DateTime.now();
   late List<SuperHero>? _powerHeros;
-  late SuperHero? _powerHeroDropdownValue;
+  late SuperHero? _heroDropdownValue;
   
 
   @override
@@ -33,7 +33,7 @@ class _MovieListPage extends State<MovieListPage>{
   void _load() async {
     _movieList = await _movieService.getMovieList();
     _powerHeros = await _heroService.getHeroesForDropdown();
-    _powerHeroDropdownValue = _powerHeros?.first;
+    _heroDropdownValue = _powerHeros?.first;
     setState(() {});
   }
 
@@ -90,6 +90,7 @@ class _MovieListPage extends State<MovieListPage>{
                                   },
                                 ),
                                 const SizedBox(height: 20),
+                                const Text('Release Date'),
                                 ElevatedButton(
                                   onPressed: () async {
                                     DateTime? newDate = await showDatePicker(
@@ -108,7 +109,7 @@ class _MovieListPage extends State<MovieListPage>{
                                 const SizedBox(height: 20),
                                 const Text('Hero'),
                                 DropdownButtonFormField<SuperHero>(
-                                  value: _powerHeroDropdownValue,
+                                  value: _heroDropdownValue,
                                   items: _powerHeros?.map((SuperHero items){
                                     return DropdownMenuItem<SuperHero>(
                                       value: items,
@@ -117,7 +118,7 @@ class _MovieListPage extends State<MovieListPage>{
                                   }).toList(), 
                                   onChanged: (SuperHero? newValue) { 
                                     setState(() {
-                                      _powerHeroDropdownValue = newValue;
+                                      _heroDropdownValue = newValue;
                                     });
                                   },
                                 ),
@@ -130,7 +131,10 @@ class _MovieListPage extends State<MovieListPage>{
                                         Movie(
                                           id: _movieList![index].id,
                                           title: _titleFieldKey.currentState?.value,
-                                          description: _descriptionFieldKey.currentState?.value
+                                          description: _descriptionFieldKey.currentState?.value,
+                                          instructor: _instructorFieldKey.currentState?.value,
+                                          superHeroId: _heroDropdownValue?.id,
+                                          releaseDate: _releasedDate.toIso8601String()
                                         )
                                       );
                                       if(updated != null){
@@ -168,7 +172,108 @@ class _MovieListPage extends State<MovieListPage>{
             
           ),
         ),
-        
+      floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () => {
+            showDialog(
+              context: (context), 
+              builder: (content) {
+                return AlertDialog(
+                  title: const Text('Add New Movie'),
+                  content: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                       TextFormField(
+                          key: _titleFieldKey,
+                          decoration: const InputDecoration(labelText: 'Title'),
+                          validator: (val) {
+                            return (val == null || val.isEmpty) ? 'Please enter the power' : null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          key: _descriptionFieldKey,
+                          decoration: const InputDecoration(labelText: 'Description'),
+                          validator: (val) {
+                            return (val == null || val.isEmpty) ? 'Please enter the description' : null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          key: _instructorFieldKey,
+                          decoration: const InputDecoration(labelText: 'Instructor'),
+                          validator: (val) {
+                            return (val == null || val.isEmpty) ? 'Please enter the instructor' : null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () async {
+                            DateTime? newDate = await showDatePicker(
+                              context: context, 
+                              initialDate: _releasedDate,
+                              firstDate: DateTime(1900), 
+                              lastDate: DateTime(2100)
+                            );
+                            if(newDate == null) return;
+                            setState(() {
+                                _releasedDate = newDate;
+                            });
+                          }, 
+                          child: Text('${_releasedDate}'),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text('Hero'),
+                        DropdownButtonFormField<SuperHero>(
+                          value: _heroDropdownValue,
+                          items: _powerHeros?.map((SuperHero items){
+                            return DropdownMenuItem<SuperHero>(
+                              value: items,
+                              child: Text(items.name.toString())
+                            );
+                          }).toList(), 
+                          onChanged: (SuperHero? newValue) { 
+                            setState(() {
+                              _heroDropdownValue = newValue;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        const Text('Release Date'),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if(_formKey.currentState!.validate()){
+                              _formKey.currentState?.save();
+                              var newPower = await _movieService.addMovie(
+                                Movie(
+                                  title: _titleFieldKey.currentState?.value,
+                                  description: _descriptionFieldKey.currentState?.value,
+                                  instructor: _instructorFieldKey.currentState?.value,
+                                  superHeroId: _heroDropdownValue?.id,
+                                  releaseDate: _releasedDate.toIso8601String()
+                                )
+                              );
+                              if(newPower != null){
+                                setState(() {
+                                  _movieList?.add(newPower);
+                                });
+                                Navigator.pop(context);
+                              }
+                            }
+                          },
+                          child: const Text('Add'),
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              }
+            )
+          },
+        ),
     );
   }
 
