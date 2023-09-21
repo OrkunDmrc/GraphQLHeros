@@ -63,6 +63,7 @@ class _PowerListPage extends State<PowerListPage>{
                               children: [
                                 TextFormField(
                                   key: _powerPowerFieldKey,
+                                  maxLength: 50,
                                   decoration: const InputDecoration(labelText: 'Power'),
                                   validator: (val) {
                                     return (val == null || val.isEmpty) ? 'Please enter the power' : null;
@@ -71,6 +72,7 @@ class _PowerListPage extends State<PowerListPage>{
                                 const SizedBox(height: 20),
                                 TextFormField(
                                   key: _powerDescriptionFieldKey,
+                                  maxLength: 50,
                                   decoration: const InputDecoration(labelText: 'Description'),
                                   validator: (val) {
                                     return (val == null || val.isEmpty) ? 'Please enter the description' : null;
@@ -155,6 +157,7 @@ class _PowerListPage extends State<PowerListPage>{
                       children: [
                         TextFormField(
                           key: _powerPowerFieldKey,
+                          maxLength: 50,
                           decoration: const InputDecoration(labelText: 'Power'),
                           validator: (val) {
                             return (val == null || val.isEmpty) ? 'Please enter the power' : null;
@@ -163,6 +166,7 @@ class _PowerListPage extends State<PowerListPage>{
                         const SizedBox(height: 20),
                         TextFormField(
                           key: _powerDescriptionFieldKey,
+                          maxLength: 50,
                           decoration: const InputDecoration(labelText: 'Description'),
                           validator: (val) {
                             return (val == null || val.isEmpty) ? 'Please enter the description' : null;

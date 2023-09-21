@@ -5,7 +5,7 @@ class SuperHero{
   final String? id;
   final String? name;
   final String? description;
-  final String? height;
+  final double? height;
   final List<Power>? superpowers;
   final List<Movie>? movies;
   SuperHero({

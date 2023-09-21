@@ -71,12 +71,16 @@ class HeroService {
     }
   }
 
-  Future<bool> addHero(SuperHero hero) async {
+  Future<SuperHero?> addHero(SuperHero hero) async {
     String document = 
     """
       mutation(\$hero: SuperheroInput!){
         addSuperhero(superhero: \$hero) {
           id
+          name
+          superpowers{
+            superPower
+          }
         }
       }
     """;
@@ -99,20 +103,24 @@ class HeroService {
       }
       var res = result.data?['addSuperhero'];
       if(res == null || res.isEmpty){
-        return false;
+        return null;
       }
-      return true;
+      return SuperHero.fromMap(map: res);
     } catch (e) {
       throw Exception(e);
     }
   }
 
-    Future<bool> updateHero(SuperHero hero) async {
+    Future<SuperHero?> updateHero(SuperHero hero) async {
     String document = 
     """
       mutation(\$hero: SuperheroInput!){
         updateSuperhero(superhero: \$hero) {
           id
+          name
+          superpowers{
+            superPower
+          }
         }
       }
     """;
@@ -136,9 +144,9 @@ class HeroService {
       }
       var res = result.data?['updateSuperhero'];
       if(res == null || res.isEmpty){
-        return false;
+        return null;
       }
-      return true;
+      return SuperHero.fromMap(map: res);
     } catch (e) {
       throw Exception(e);
     }

@@ -68,14 +68,16 @@ class _MovieListPage extends State<MovieListPage>{
                               children: [
                                 TextFormField(
                                   key: _titleFieldKey,
+                                  maxLength: 50,
                                   decoration: const InputDecoration(labelText: 'Title'),
                                   validator: (val) {
-                                    return (val == null || val.isEmpty) ? 'Please enter the power' : null;
+                                    return (val == null || val.isEmpty) ? 'Please enter the title' : null;
                                   },
                                 ),
                                 const SizedBox(height: 20),
                                 TextFormField(
                                   key: _descriptionFieldKey,
+                                  maxLength: 50,
                                   decoration: const InputDecoration(labelText: 'Description'),
                                   validator: (val) {
                                     return (val == null || val.isEmpty) ? 'Please enter the description' : null;
@@ -84,6 +86,7 @@ class _MovieListPage extends State<MovieListPage>{
                                 const SizedBox(height: 20),
                                 TextFormField(
                                   key: _instructorFieldKey,
+                                  maxLength: 50,
                                   decoration: const InputDecoration(labelText: 'Instructor'),
                                   validator: (val) {
                                     return (val == null || val.isEmpty) ? 'Please enter the instructor' : null;
@@ -188,6 +191,7 @@ class _MovieListPage extends State<MovieListPage>{
                       children: [
                        TextFormField(
                           key: _titleFieldKey,
+                          maxLength: 50,
                           decoration: const InputDecoration(labelText: 'Title'),
                           validator: (val) {
                             return (val == null || val.isEmpty) ? 'Please enter the power' : null;
@@ -196,6 +200,7 @@ class _MovieListPage extends State<MovieListPage>{
                         const SizedBox(height: 20),
                         TextFormField(
                           key: _descriptionFieldKey,
+                          maxLength: 50,
                           decoration: const InputDecoration(labelText: 'Description'),
                           validator: (val) {
                             return (val == null || val.isEmpty) ? 'Please enter the description' : null;
@@ -204,6 +209,7 @@ class _MovieListPage extends State<MovieListPage>{
                         const SizedBox(height: 20),
                         TextFormField(
                           key: _instructorFieldKey,
+                          maxLength: 50,
                           decoration: const InputDecoration(labelText: 'Instructor'),
                           validator: (val) {
                             return (val == null || val.isEmpty) ? 'Please enter the instructor' : null;
